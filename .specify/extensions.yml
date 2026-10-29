@@ -1,0 +1,24 @@
+installed:
+- design
+settings:
+  auto_execute_hooks: true
+hooks:
+  before_plan:
+  - extension: design
+    command: speckit.design.check
+    enabled: true
+    optional: false
+    priority: 5
+    prompt: Execute speckit.design.check?
+    description: Enforce Recall -> Reuse -> Compose -> Extend -> Create before planning
+    condition: null
+  after_implement:
+  - extension: design
+    command: speckit.design.validate
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Execute speckit.design.validate?
+    description: Validate the implementation against the spec, the principles and
+      the design system
+    condition: null

@@ -1,0 +1,205 @@
+schema_version: '1.0'
+decisions:
+- capability: notes collection toolbar with view, sorting, and search
+  aliases:
+  - top navigation actions and centered search
+  - toolbar
+  - toggle between grid and list
+  - button toggle
+  - sort order icon button
+  - icon button
+  - search text input
+  - form field
+  - grid list switch and order button
+  resolution: compose-components
+  decision: MatToolbar composed with MatButtonToggleGroup, matIconButton, MatFormField, and MatInput;
+    view and sort controls on the left with centered search
+  components:
+  - MatToolbar
+  - MatButtonToggleGroup
+  - matIconButton
+  - MatFormField
+  - MatInput
+  constraints:
+    tokens:
+    - color.surface
+    - color.on-surface
+    - typography.body-medium
+    - shape.corner-full
+    states:
+    - default
+    - hover
+    - focus
+    - disabled
+    - loading
+    - error
+    responsive: reflow without clipping
+    accessibility:
+    - semantic controls
+    - keyboard operable
+    - visible focus
+    - accessible names
+    interaction: view toggle, sort mode, centered search
+  design_system: angular-material-m3
+  design_system_version: 22.2.5
+  decided_in: 001-gerenciar-notas
+  id: dd-001
+  status: active
+  decided_on: '2026-10-29'
+- capability: note creation form
+  aliases:
+  - create or edit a note form
+  - form field
+  resolution: compose-components
+  decision: MatFormField with MatInput for note fields and matIconButton for icon-only actions
+  components:
+  - MatFormField
+  - MatInput
+  - matIconButton
+  constraints:
+    tokens:
+    - color.outline
+    - color.on-surface
+    - typography.body-medium
+    - shape.corner-small
+    states:
+    - default
+    - focus
+    - disabled
+    - loading
+    - error
+    responsive: reflow without clipping
+    accessibility:
+    - semantic controls
+    - keyboard operable
+    - visible focus
+    - accessible names
+    interaction: form placed immediately below toolbar
+  design_system: angular-material-m3
+  design_system_version: 22.2.5
+  decided_in: 001-gerenciar-notas
+  id: dd-002
+  status: active
+  decided_on: '2026-10-29'
+- capability: note cards and manual reorder interaction
+  aliases:
+  - note card with images and hover actions
+  - note image card drag surface
+  - note summary tile with media and actions
+  - notes collection layout
+  - pinned notes card collection layout
+  resolution: compose-components
+  decision: MatCard with full-width mat-card-image and matIconButton actions; apply feature-specific background/hover
+    styling and CDK drag behavior to the full card, with keyboard alternative
+  components:
+  - MatCard
+  - mat-card-image
+  - matIconButton
+  - CdkDrag
+  - CdkDropList
+  rejected:
+  - candidate: button-toggle
+    reason: selection control, not a note content surface
+  - candidate: form-field
+    reason: input control, not a note content surface
+  constraints:
+    tokens:
+    - color.surface
+    - color.surface-container
+    - color.on-surface
+    - typography.title-medium
+    - typography.body-medium
+    - shape.corner-medium
+    states:
+    - default
+    - hover
+    - focus
+    - active
+    - loading
+    - error
+    - empty
+    responsive: grid reflows; list remains usable
+    accessibility:
+    - accessible icon names
+    - pointer/touch/keyboard
+    - no color-only meaning
+    interaction: drag begins anywhere on card
+  design_system: angular-material-m3
+  design_system_version: 22.2.5
+  decided_in: 001-gerenciar-notas
+  id: dd-003
+  status: active
+  decided_on: '2026-10-29'
+- capability: note detail modal
+  aliases:
+  - modal dialog for note details
+  - modal detail view
+  - note details overlay
+  - note detail popup dialog
+  - note details overlay presentation
+  - MatDialog
+  resolution: reuse
+  decision: MatDialog with accessible title, Escape and visible close action, and focus restoration to
+    the trigger
+  components:
+  - MatDialog
+  constraints:
+    tokens:
+    - color.surface
+    - color.on-surface
+    - typography.title-medium
+    - typography.body-medium
+    - shape.corner-large
+    states:
+    - open
+    - focus
+    - loading
+    - error
+    - closed
+    responsive: dialog content reflows
+    accessibility:
+    - keyboard operable
+    - accessible title
+    - dismissible focus containment
+    - focus restoration
+    interaction: modal detail opened from note card
+  design_system: angular-material-m3
+  design_system_version: 22.2.5
+  decided_in: 001-gerenciar-notas
+  id: dd-004
+  status: active
+  decided_on: '2026-10-29'
+- capability: note collection and operation feedback
+  aliases:
+  - empty and error feedback for note collection
+  - empty state and operation failure message
+  resolution: compose-components
+  decision: semantic status and error text with Material form-field validation and local SVG icons for
+    recovery actions
+  components:
+  - MatFormField
+  - MatIcon
+  - matIconButton
+  constraints:
+    tokens:
+    - color.on-surface
+    - color.primary
+    - typography.body-medium
+    states:
+    - loading
+    - empty
+    - no-results
+    - error
+    - conflict
+    responsive: messages reflow without clipping
+    accessibility:
+    - status announced
+    - error described in text
+    - no color-only meaning
+    interaction: actionable next step where applicable
+  design_system: angular-material-m3
+  design_system_version: 22.2.5
+  decided_in: 001-gerenciar-notas
+  id: dd-005
+  status: active
+  decided_on: '2026-10-29'

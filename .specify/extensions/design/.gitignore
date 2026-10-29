@@ -1,0 +1,33 @@
+# Local configuration overrides
+design-config.local.yml
+*-config.local.yml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+node_modules/
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
+
+# Benchmark runs: the scores and the manifest are worth committing, the
+# workspace a run happened in (a whole spec-kit project, plus whatever the
+# agent installed) is not.
+benchmarks/results/**/workspace/
+benchmarks/results/**/agent.std*.txt

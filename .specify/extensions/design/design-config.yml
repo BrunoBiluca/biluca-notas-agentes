@@ -1,0 +1,184 @@
+# Spec Kit Design System: project configuration
+#
+# This file says how to reach YOUR design system. That is all it is for. The
+# extension models no design system of its own, it only knows how to ask, and
+# everything else has a working default.
+#
+# For most projects the whole file is one line.
+
+# Which adapter to load from .specify/extensions/design/adapters/<id>.yml
+#
+#   auto          detect it (the default): components.json -> shadcn,
+#                 @mui/material, antd, @chakra-ui/react, @ark-ui/react,
+#                 radix-ui / @radix-ui/* in package.json, otherwise static-json.
+#                 Leave this alone unless detection picks wrong.
+#   shadcn        the shadcn/ui CLI
+#   mui, antd, chakra, radix, ark-ui
+#                 read a generated inventory file, like static-json
+#   static-json   no CLI needed; reads a generated inventory file (the default)
+#   markdown-specs
+#                 a folder of Markdown spec files, one per foundation, token
+#                 group and component; `auto` picks it when
+#                 .design-system/specs exists
+#   example       a template to copy and rename for your own CLI
+#   custom        define everything inline under `capabilities:` below
+adapter: static-json
+
+# Override the binary the adapter invokes. Leave empty to use the adapter's own.
+# Split on whitespace, so wrappers work:
+#   "npm run ds --"  ·  "pnpm --filter @acme/web exec ds"  ·  "./bin/ds"
+bin: ""
+
+# Working directory for the design system, relative to repo root. Empty = repo
+# root. Both CLI calls and file lookups resolve against it, so a monorepo can
+# point at one package.
+cwd: ""
+
+# File-backed adapters only: where the inventory lives (static-json and the
+# library adapters; default .design-system/inventory.json), or the folder of spec
+# files (markdown-specs; default .design-system/specs).
+# source: "node_modules/@acme/design-system/inventory.json"
+
+# markdown-specs only: which top-level folder holds which kind of spec, added
+# to the adapter's own map. Sections: components, patterns, foundations,
+# tokens, principles.
+# tiers:
+#   primitives: components
+#   layouts: patterns
+
+# --- everything below is optional --------------------------------------------
+
+# Principles are resolved in one order, and the first source that answers wins
+# outright:
+#
+#   1. your design system's CLI       (`principles` capability)
+#   2. static data it ships           (inventory key, or the file named here)
+#   3. the small default set in principles/default.yml
+#
+# They are never merged. A design system that states its own principles should
+# not also inherit ours. You normally configure nothing here.
+#
+# principles:
+#   # A principles file your design system publishes. Resolved next to this
+#   # config, or from the repo root, so it can live inside the package itself.
+#   source: "node_modules/@acme/design-system/principles.yml"
+#   # false runs with no principles at all, rather than with the default set.
+#   default: true
+#   # Ids to switch off. Reported in the spec with a reason, never dropped
+#   # silently. Run `ds.sh principles` to see the ids currently in force.
+#   disabled: []
+
+# Your team's Definition of Done, if you keep one. Nothing to configure for it:
+# write the list in `definition-of-done.md` next to this file and validation
+# checks it. No file means no DoD, which is the normal case and costs nothing.
+#
+# Nothing is shipped as a default here, and nothing ever will be. A DoD is what
+# your team agreed among themselves; a set that arrived with an extension would
+# raise findings against rules nobody at your place ever accepted.
+#
+# It sits here rather than in `.specify/memory/` on purpose. The decision ledger
+# there is derived and can be rebuilt from the design system, so clearing it is
+# a reasonable thing to do. Your DoD cannot be rebuilt from anything.
+#
+# Set `source` only to read it from somewhere else — a shared file in a monorepo,
+# or one your design system package ships. Resolved next to this config, then
+# from the repo root, like `principles.source`. A path that does not resolve is
+# reported rather than treated as "no DoD".
+#
+# dod:
+#   source: "docs/definition-of-done.md"
+
+# The design system version in use. Prior decisions taken against a different
+# one are flagged stale rather than reused silently, and `ds.sh sync` compares
+# it with the committed snapshot. Normally read for you from the installed
+# package: the one the adapter stands for (@mui/material, antd, ...), or the one
+# named in `design_system_package`. Set `design_system_version` only to override
+# that. When nothing answers, staleness simply is not checked, which lookups
+# report rather than implying freshness.
+# design_system_package: "@acme/design-system"
+# design_system_version: ""
+
+# Capability overrides. The extension is written against capability names only;
+# the adapter maps each to a real invocation. Anything unmapped degrades rather
+# than failing. Override one when your CLI differs from the shipped adapter:
+#
+# capabilities:
+#   search:
+#     args: ["search", "{query}", "--json", "--detail", "compact"]
+#     result_path: "data.results"
+#   tokens:
+#     read_file: "design/tokens.json"
+#   # Where one command answers two questions - most systems state their
+#   # breakpoints inside the token payload - carve out the slice, or
+#   # `breakpoints` answers with the whole token set and every phase that asks
+#   # pays for it twice. `result_paths` takes the first candidate that resolves;
+#   # `pick` keeps named keys. `ds.sh context plan --json` reports the size of
+#   # each section, and says so in `notes` when an answer arrives unnarrowed.
+#   breakpoints:
+#     args: ["tokens"]
+#     result_paths: ["data.breakpoints", "data.screens"]
+#   # A capability may name its own binary, for the jobs that are not the design
+#   # system's to do: filing a gap, ejecting a component. `bin` here wins over
+#   # the adapter's, and the adapter's `global_args` and `envelope` do not apply
+#   # to it. Works on a file-backed adapter too, which is how a static inventory
+#   # gets a write side.
+#   report_gap:
+#     bin: "gh"
+#     args: ["issue", "create", "--repo", "acme/design-system",
+#            "--title", "{title}", "--body", "{body}"]
+
+# The decision ledger: prior ladder decisions, so the second feature to need a
+# date range reads the answer instead of searching for it again.
+#
+# ledger:
+#   # false stops both the lookup and the recording. Every feature then starts
+#   # from nothing and re-argues settled questions.
+#   enabled: true
+#   # How much of the shorter phrase must overlap for a prior decision to be
+#   # surfaced. Surfaced decisions are evidence, not instructions, so this leans
+#   # toward showing a near miss rather than hiding one. Raise it if lookups
+#   # surface decisions you keep rejecting; lower it if you keep re-deciding
+#   # things the ledger already answered. `ds.sh ledger lookup "<phrase>"`
+#   # reports the score of every match, which is how you tune it.
+#   match_threshold: 0.34
+
+# workflow:
+#   # How many validate -> fix rounds before the run stops and asks for a human.
+#   # Round 1 reviews the whole change; round 2 checks only the fixes.
+#   max_validation_rounds: 2
+
+# cache:
+#   # Answers from the design system's CLI are remembered per feature, so a run
+#   # asks each question once rather than once per phase, task and validation
+#   # round. Failures are never remembered, and the gate's reachability probe is
+#   # always a real call. Turn it off to measure the uncached cost; the call
+#   # count in `ds.sh cache stats` is kept either way. If the design system
+#   # changes mid-feature, `ds.sh cache clear` starts over.
+#   enabled: true
+#   ttl_minutes: 480
+
+# gate:
+#   # false lets the ladder run and record findings without blocking planning.
+#   # Useful while adopting.
+#   enforce: true
+#   # How many existing candidates must be rejected before a surface may land
+#   # on Extend or Create. Reuse and Compose need no quota. Lower it only if
+#   # your design system genuinely offers fewer.
+#   min_candidates_considered: 3
+
+# validation:
+#   # Where the implementation lives, for the validate pass to read. Unset, it
+#   # is inferred from the plan's `## Project Structure` section.
+#   source_globs: ["src/**/*.tsx", "src/**/*.css"]
+#   # Raise a finding for a hardcoded value where the design system has a token.
+#   # Ignored when the system has no token layer at all.
+#   forbid_raw_values: true
+#   # Files that define the tokens, where literal values belong. `ds.sh scan`
+#   # reports no raw values in them. `ds.sh scan --strict` exits 1 on any
+#   # violation, for a CI job; `ds.sh sync --strict` does the same when the
+#   # design system moved under something the project still names.
+#   theme_globs: ["src/theme/**/*.ts", "src/styles/tokens.css"]
+#   # What every UI feature must answer for. A dimension the design system
+#   # cannot supply is dropped rather than failed on, so `tokens` disappears
+#   # from this list for a system with no tokens.
+#   required_dimensions: [states, responsive, accessibility, tokens, interaction]

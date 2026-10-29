@@ -1,0 +1,147 @@
+schema_version: "1.0"
+
+extension:
+  id: design
+  name: "Spec Kit Design System"
+  version: "0.3.0"
+  description: "Give it an RFC. It runs the Spec Kit workflow and implements the change using your design system."
+  category: integration
+  effect: read-write
+  author: "artursopelnik"
+  repository: https://github.com/artursopelnik/spec-kit-design-system
+  homepage: https://github.com/artursopelnik/spec-kit-design-system
+  license: MIT
+
+requires:
+  # Verified against 1.0.9.dev0. Earlier versions are untested rather than known
+  # broken. A floor of 0.1.0 was claimed before anything was actually installed,
+  # which is the failure mode that makes catalog entries unusable.
+  speckit_version: ">=1.0.0,<2.0.0"
+  # Only what every run executes: the bash shim and the interpreter it finds
+  # (PyYAML must be importable by it). The test suite passes on 3.9.
+  # The design system CLI is deliberately not listed. It is named in
+  # design-config.yml instead, because it differs per project (shadcn, an
+  # in-house binary, or no CLI at all), and declaring one would imply
+  # a dependency this extension does not have.
+  tools:
+    - name: "python3"
+      version: ">=3.9"
+      required: true
+    - name: "bash"
+      required: true
+
+provides:
+  commands:
+    # The one a developer needs to know. Everything below it is the machinery
+    # this drives, and it is also what the hooks fire.
+    - name: speckit.design.run
+      file: commands/speckit.design.run.md
+      description: "Take an RFC and run it to done: clarify, specify, plan, implement, validate, fix, verify"
+
+    - name: speckit.design.check
+      file: commands/speckit.design.check.md
+      description: "Resolve what the design system offers, walk the Recall -> Reuse -> Compose -> Extend -> Create ladder, write the design requirements into the spec, and gate the plan on the outcome"
+
+    - name: speckit.design.validate
+      file: commands/speckit.design.validate.md
+      description: "Check the implementation independently and raise findings that feed back into fixing"
+
+  config:
+    - name: "design-config.yml"
+      template: "config-template.yml"
+      description: "Which design system adapter to use. Usually three lines."
+      required: true
+
+hooks:
+  # The phases are wired here, not in the run command, so they also hold for
+  # anyone driving spec-kit by hand. /speckit.design.run is the autonomous
+  # path over the same rails, not a second implementation of them.
+  #
+  # There is deliberately no after_specify hook. The design system is consulted
+  # once before planning, by the gate, which searches, decides and writes the
+  # spec's design requirements in one pass instead of searching every surface
+  # twice.
+
+  # The gate. Planning must not begin until the reuse ladder has been walked.
+  before_plan:
+    command: speckit.design.check
+    optional: false
+    priority: 5
+    description: "Enforce Recall -> Reuse -> Compose -> Extend -> Create before planning"
+
+  # Independent validation closes the loop, and its findings drive the fix pass.
+  after_implement:
+    command: speckit.design.validate
+    optional: false
+    description: "Validate the implementation against the spec, the principles and the design system"
+
+tags:
+  - "design-system"
+  - "design-tokens"
+  - "accessibility"
+  - "autonomous"
+  - "reuse"
+
+config:
+  defaults:
+    # Which adapter under adapters/ describes the project's design system.
+    # "auto" detects one from the project (components.json -> shadcn,
+    # a known component library in package.json, else static-json).
+    # Name one to pin it.
+    adapter: auto
+
+    principles:
+      # Fall back to the small default set when the design system supplies no
+      # principles of its own. Set false to run with none rather than ours.
+      default: true
+      # Principle ids to switch off. Reported, never hidden.
+      disabled: []
+
+    workflow:
+      # Validate -> fix -> validate, bounded. Round 1 reviews the whole change;
+      # round 2 checks only the fixes. When findings survive both, the run stops
+      # and says so instead of looping.
+      max_validation_rounds: 2
+
+    ledger:
+      # Consult prior ladder decisions before querying the design system, and
+      # record each new one. Without this, every feature re-litigates settled
+      # questions against an empty context.
+      enabled: true
+      # How much of the shorter phrase must overlap for a prior decision to be
+      # surfaced. Lookups report the score of every match, which is how it is
+      # tuned.
+      match_threshold: 0.34
+
+    cache:
+      # Remember the design system's answers for the active feature, so the
+      # same question is not put to its CLI again by every phase, task and
+      # validation round. Failures are never remembered, and the probe that
+      # proves reach is always a real call. `ds.sh cache stats` reports how
+      # often the CLI was actually asked; `ds.sh cache clear` starts over.
+      enabled: true
+      # How long an answer stays good. A new feature starts fresh regardless.
+      ttl_minutes: 480
+
+    gate:
+      # Block planning when the ladder was not walked or its rungs are unjustified.
+      enforce: true
+      # Minimum number of existing candidates that must be rejected before a
+      # surface may land on Extend or Create. Reuse and Compose need no quota:
+      # they use what exists, and proving that takes one search.
+      min_candidates_considered: 3
+
+    validation:
+      # Fail validation on hardcoded values where a token exists.
+      forbid_raw_values: true
+      # Files where literal values belong, because they define the tokens
+      # (a theme, a tokens file). `ds.sh scan` does not report raw values in
+      # them. Globs relative to the repo root.
+      theme_globs: []
+      # Dimensions every UI feature must answer for.
+      required_dimensions:
+        - states
+        - responsive
+        - accessibility
+        - tokens
+        - interaction

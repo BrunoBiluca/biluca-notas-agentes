@@ -1,0 +1,152 @@
+# Template adapter. Copy this file, rename it, and point it at your CLI.
+#
+# Nothing here describes a real product. `your-design-system-cli` is a
+# placeholder and the flags are invented, so this file will not run as-is.
+# For adapters that do run, see `shadcn.yml`, which maps a real CLI surface.
+#
+# If your CLI can describe itself (some emit a JSON manifest of their commands,
+# arguments and response types), ask it first and write the mapping from what it
+# reports rather than from its documentation.
+
+id: example
+name: "Example Design System"
+
+# How the CLI is invoked. Split on whitespace, so wrappers work:
+#   "npx my-ds"  ·  "npm run ds --"  ·  "pnpm --filter @acme/web exec ds"  ·  "./bin/ds"
+bin: "your-design-system-cli"
+
+# Appended to every invocation. Most CLIs need a flag to emit JSON.
+global_args: ["--json"]
+
+# How to read the CLI's response envelope. Omit if it returns bare JSON.
+envelope:
+  type_key: "type" # key naming the response kind, if any
+  data_key: "data" # key holding the payload
+  error_code_key: "code" # key holding a machine-readable error code
+
+capabilities:
+  # --- required ---------------------------------------------------------------
+
+  search:
+    # The single most valuable call for the reuse ladder. If the CLI can rank
+    # across components, patterns and docs in one query, map that here.
+    args: ["search", "{query}"]
+    result_path: "data.results"
+
+  component:
+    args: ["show", "{name}"]
+    result_path: "data"
+    # Error codes meaning "asked successfully, and it does not exist".
+    # Everything else is treated as a failure to ask, never as an empty result,
+    # so an outage cannot read as "the design system has nothing".
+    not_found_codes: ["ERR_NOT_FOUND"]
+
+  # --- optional, each one improves the gate ------------------------------------
+
+  describe:
+    # Self-description, if the CLI offers it. Used to check this file against
+    # the CLI's real surface when a capability starts failing.
+    args: ["manifest"]
+    result_path: "data"
+
+  list_components:
+    args: ["list"]
+    result_path: "data"
+
+  pattern:
+    # Whatever your system calls a composed arrangement: pattern, template,
+    # block, recipe.
+    args: ["pattern", "{name}"]
+    result_path: "data"
+    not_found_codes: ["ERR_NOT_FOUND"]
+
+  tokens:
+    args: ["tokens", "{theme}"]
+    result_path: "data"
+    defaults:
+      theme: "default"
+
+  breakpoints:
+    # Separate from tokens because responsive requirements are written using
+    # these names. If the agent cannot look them up, it invents them. Map this
+    # to wherever your system states them, even if that is the token command.
+    args: ["breakpoints"]
+    result_path: "data"
+    #
+    # Most systems have no breakpoint command and state them inside the token
+    # payload. Mapping both capabilities onto the same call is correct; leaving
+    # them mapped to the same *slice* of it is not, because `breakpoints` then
+    # answers with the entire token set and every phase that asks pays for it:
+    #
+    #   breakpoints:
+    #     args: ["tokens"]
+    #     result_paths: ["data.breakpoints", "data.screens", "data.theme.screens"]
+    #
+    # `result_paths` tries each candidate in order and takes the first that
+    # resolves, so one mapping can cover systems that name it differently.
+    # `pick` narrows to named keys where the answer is several siblings rather
+    # than one subtree:
+    #
+    #   pick: ["breakpoints", "container_widths"]
+    #
+    # When nothing resolves, the response comes back whole with
+    # `result_path_missed: true` rather than as a null, and `ds.sh context`
+    # says so in `notes`. That is the signal to fix the path here.
+
+  principles:
+    # Your design system's own principles and guidance, in whatever form it
+    # publishes them. Prose, a rule list, or both. When this answers, it IS the
+    # principles for the run: the default set shipped with this extension is not
+    # merged in and not consulted. Map it if there is anything to map.
+    args: ["docs", "principles"]
+    result_path: "data"
+
+  extend:
+    # The sanctioned way to customize a component, such as a command that copies
+    # its source for local modification. Mapping this makes rung 4 a real check
+    # rather than advice.
+    #
+    # Many CLIs have no such command. Where another tool does the job, give the
+    # capability its own binary rather than writing a wrapper:
+    #
+    #   extend:
+    #     bin: "./scripts/swizzle.sh"
+    #     args: ["{name}", "--dry-run"]
+    #
+    # Otherwise leave it unmapped: the ladder still walks rung 4 against the
+    # component's documented extension points, it just cannot confirm them
+    # with the system. `ds.sh gate --json` reports which
+    # rungs are automated under `LADDER_SUPPORT`, so the cost is visible rather
+    # than inferred. An invented mapping is worse than none, because a rung that
+    # reports success without checking anything is how a fork gets waved
+    # through as a sanctioned extension.
+    args: ["eject", "{name}", "--dry-run"]
+    result_path: "data"
+
+  report_gap:
+    # Where a genuine gap is filed. Mapping this means rung 5 routes into the
+    # design system's own intake instead of dead-ending in a document.
+    #
+    # Almost never the design system's own CLI, so this one usually names its
+    # binary:
+    #
+    #   report_gap:
+    #     bin: "gh"
+    #     args: ["issue", "create", "--repo", "acme/design-system",
+    #            "--title", "{title}", "--body", "{body}"]
+    #
+    # A capability with its own binary is invoked on its own terms: `bin` here
+    # wins over the adapter's, and `global_args` and `envelope` above are not
+    # applied to it.
+    #
+    # Unmapped, the gap record is still written to the feature directory and the
+    # gate still blocks without it; only the routing is manual.
+    args: ["request", "--title", "{title}", "--body", "{body}"]
+    result_path: "data"
+
+  validate:
+    # Some systems can check an implementation themselves: a lint rule, a token
+    # audit, a codemod in --check mode. Mapping this makes the validate phase
+    # ask the design system rather than only reasoning about it.
+    args: ["lint", "{target}"]
+    result_path: "data"

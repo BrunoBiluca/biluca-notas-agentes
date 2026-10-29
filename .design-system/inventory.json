@@ -1,0 +1,52 @@
+{
+  "version": "1.0",
+  "source": "angular-material-m3",
+  "tokens": {
+    "color": {
+      "primary": "#6750A4",
+      "on-primary": "#FFFFFF",
+      "surface": "#FEF7FF",
+      "on-surface": "#1D1B20",
+      "surface-container": "#F3EDF7",
+      "outline": "#79747E"
+    },
+    "typography": {
+      "label-large": "500 0.875rem/1.25rem Roboto, sans-serif",
+      "title-medium": "500 1rem/1.5rem Roboto, sans-serif",
+      "body-medium": "400 0.875rem/1.25rem Roboto, sans-serif"
+    },
+    "shape": {
+      "corner-none": "0",
+      "corner-extra-small": "4px",
+      "corner-small": "8px",
+      "corner-medium": "12px",
+      "corner-large": "16px",
+      "corner-full": "9999px"
+    },
+    "density": {
+      "default": "0"
+    }
+  },
+  "components": {
+    "toolbar": {
+      "height": "64px",
+      "background": "var(--mat-sys-surface)",
+      "title-font": "var(--mat-sys-title-large)"
+    },
+    "icon-button": {
+      "size": "48px",
+      "icon-size": "24px",
+      "color": "var(--mat-sys-on-surface-variant)"
+    },
+    "button-toggle": {
+      "height": "48px",
+      "shape": "var(--mat-sys-corner-full)",
+      "selected-background": "var(--mat-sys-secondary-container)"
+    },
+    "form-field": {
+      "outline-color": "var(--mat-sys-outline)",
+      "label-font": "var(--mat-sys-body-small)",
+      "container-height": "56px"
+    }
+  }
+}

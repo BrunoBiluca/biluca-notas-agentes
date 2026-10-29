@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "design": {
+      "version": "0.3.0",
+      "source": "local",
+      "manifest_hash": "sha256:c448e5a64bf09f4b8c0f61d2bc6bd2222b86c5b14048440cac2582268e8fc724",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {},
+      "registered_skills": [
+        "speckit-design-run",
+        "speckit-design-check",
+        "speckit-design-validate"
+      ],
+      "installed_at": "2026-10-29T18:05:24.108772+00:00"
+    }
+  }
+}
