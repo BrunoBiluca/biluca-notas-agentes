@@ -41,14 +41,37 @@ Aplicação Angular local para criar, consultar, editar, remover, buscar e organ
 | Dependências justificadas e aprovadas | Atendido: Angular Material foi solicitado explicitamente como base da interface; CDK e NgRx Signals também foram escolhidos explicitamente. [research.md](./research.md) registra justificativas e alternativas. Playwright foi escolhido para validar APIs reais do navegador e sua inclusão em T002 foi aprovada pelo usuário ao solicitar o registro desta justificativa no plano. Angular Material e CDK serão alinhados em 22.2.5; os demais pacotes Angular/NgRx permanecem alinhados à major 22. A camada IndexedDB usará APIs nativas, sem wrapper adicional. Vitest é a escolha requerida e suportada pelo Angular CLI. |
 | Angular estável mais recente no início da implementação | Atendido: a pesquisa de 2026-10-28 confirma Angular 22 estável, em suporte ativo e como major atual; o alvo explícito Angular 22 é compatível. |
 | Angular Signal Forms | Atendido: telas de criação e edição usarão `@angular/forms/signals`; outras abordagens de formulário não serão introduzidas. |
-| Sistema de design e acessibilidade | Atendido: [design-system.md](./design-system.md) registra a composição Material 3, os tokens disponíveis, os estados e as restrições de acessibilidade. A documentação oficial confirma os componentes que faltam no inventário local; o inventário precisa ser sincronizado e não fornece tokens de espaçamento, elevação ou movimento nem nomes de breakpoint. |
+| Sistema de design e acessibilidade | Atendido: [design-system.md](./design-system.md) registra as superfícies, decisões verificadas, tokens disponíveis, estados e restrições de acessibilidade. Os campos textuais usam Material, a seleção de cor/arquivo usa controles nativos e a confirmação de remoção usa confirmação nativa do navegador. A documentação oficial confirma os componentes que faltam no inventário local; não há tokens de espaçamento, elevação ou movimento nem nomes de breakpoint. |
 | Idioma | Atendido: documentação em português; identificadores e código da aplicação em inglês. |
 
 **Resultado do gate**: sem violações ou esclarecimentos pendentes.
 
 ## Plano da interface
 
-A página principal será reorganizada para colocar alternância de grade/lista e ordenação à esquerda da pesquisa centralizada, o formulário de criação logo abaixo da barra e, em seguida, as seções de notas fixadas e livres. Os controles e a modal usarão componentes oficiais Material 3; o card comporá `MatCard` com estilos específicos de fundo/hover e a interação de arraste do CDK. O arraste iniciará em qualquer área do card e continuará acessível por teclado. As ações usarão ícones locais com nomes acessíveis e serão apresentadas em hover, foco e toque. O contrato verificável está em [contracts/ui.md](./contracts/ui.md).
+A página principal será reorganizada para colocar alternância de grade/lista e ordenação à esquerda da pesquisa centralizada, o formulário de criação logo abaixo da barra e, em seguida, as seções de notas fixadas e livres. Os campos textuais e a modal de detalhe usarão componentes oficiais Material 3; cor e anexos usarão controles nativos, e a confirmação de remoção usará a confirmação nativa do navegador. O card comporá `MatCard` com estilos específicos de fundo/hover e a interação de arraste do CDK. O arraste iniciará em qualquer área do card e continuará acessível por teclado. As ações usarão ícones locais com nomes acessíveis e serão apresentadas em hover, foco e toque. O contrato verificável está em [contracts/ui.md](./contracts/ui.md).
+
+## Plano específico: ajuste visual do Search Box
+
+**Objetivo**: adequar o campo de pesquisa da toolbar à especificação DS-008, preservando sua busca, rótulo acessível, posição centralizada e comportamento responsivo.
+
+**Decisão visual**: manter `MatFormField` com `appearance="outline"` e `MatInput`; adicionar `MatIcon` de pesquisa à esquerda em `color.primary`; usar `color.surface-container` como fundo e `shape.corner-extra-small` como forma. Em repouso, esconder o contorno; em foco, manter um indicador visível. Alinhar a altura do campo à dimensão documentada para os controles da toolbar. O token de forma é o mais próximo disponível do arredondamento pedido; não há token de tamanho específico para o campo.
+
+**Escopo de implementação**:
+
+1. Ajustar o template standalone e os estilos locais de `src/app/features/notes/pages/notes-page.component.ts`, sem mudar a lógica de pesquisa nem adicionar dependências.
+2. Usar o prefixo de ícone documentado por Angular Material, mantendo o SVG local já registrado; aplicar cores e forma por tokens existentes e limitar qualquer override ao campo `.search-field`.
+3. Preservar a disposição atual: campo centralizado em viewport amplo, em linha própria abaixo dos controles em viewport estreito. Não introduzir breakpoints nomeados pelo projeto de design, pois o inventário não os fornece.
+4. Estender `tests/browser/notes-collection.spec.ts` para conferir ícone/prefixo, fundo, forma, contorno em repouso, foco visível, altura alinhada aos controles e reflow; atualizar `specs/001-gerenciar-notas/quickstart.md` para o cenário manual.
+
+**Critérios de aceite**:
+
+- A composição permanece Material (`MatFormField` + `MatInput` + `MatIcon` prefixado), com a pesquisa centralizada e funcional.
+- O fundo, o ícone e a forma usam `color.surface-container`, `color.primary` e `shape.corner-extra-small`; nenhum token ou breakpoint não existente é introduzido.
+- O estado repouso não mostra borda; foco por teclado tem indicador visível. O campo continua com nome acessível e operável por teclado.
+- A altura corresponde à dimensão dos controles da toolbar; em viewport estreita o campo ocupa uma linha própria sem recorte ou rolagem horizontal.
+- `npm run test:browser -- tests/browser/notes-collection.spec.ts`, `npm test -- --watch=false` e `npm run build` passam.
+
+**Fora de escopo**: mudanças na busca funcional, toolbar, criação de nota, persistência, modelo de dados, outros campos Material ou dependências.
 
 ## Estrutura do projeto
 

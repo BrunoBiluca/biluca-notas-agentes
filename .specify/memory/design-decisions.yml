@@ -203,3 +203,110 @@ decisions:
   id: dd-005
   status: active
   decided_on: '2026-10-29'
+- capability: note color selection and image attachment controls
+  aliases:
+  - select color for note background
+  - color picker
+  - file selection upload images
+  - image attachment file picker
+  - note color selection control
+  - color input control pattern
+  - image attachment upload flow
+  - image upload with file validation
+  resolution: compose-components
+  decision: Use native color and file inputs with labeled controls and the existing Material icon button
+    for image removal; do not create a local abstraction.
+  components:
+  - HTMLInputElement[type=color]
+  - HTMLInputElement[type=file]
+  - matIconButton
+  rejected:
+  - candidate: MatFormField/MatInput
+    reason: Text-field components do not provide the native color and file selection controls.
+  - candidate: Inventory patterns
+    reason: No color-selection or image-upload pattern is registered.
+  constraints:
+    tokens:
+    - color.primary
+    - color.on-surface
+    states:
+    - default
+    - focus
+    - error
+    responsive: reflow without clipping
+    accessibility:
+    - semantic labels
+    - keyboard operable
+    - accessible names
+    interaction: choose note color or image; allow image removal
+  design_system: angular-material-m3
+  design_system_version: 22.2.5
+  decided_in: 001-gerenciar-notas
+  id: dd-006
+  status: active
+  decided_on: '2026-10-29'
+- capability: note deletion confirmation using browser native dialog
+  aliases:
+  - confirmation before deleting a note
+  - confirm deletion dialog
+  - native confirmation dialog
+  resolution: reuse
+  decision: Use the browser-native confirmation and keep the note unchanged when the user cancels.
+  components:
+  - window.confirm
+  constraints:
+    tokens: []
+    states:
+    - confirm
+    - cancel
+    responsive: handled by browser
+    accessibility:
+    - native keyboard-operable confirmation
+    interaction: confirm or cancel note deletion
+  design_system: browser-platform
+  decided_in: 001-gerenciar-notas
+  id: dd-007
+  status: active
+  decided_on: '2026-10-29'
+- capability: search box visual appearance
+  aliases:
+  - search box visual appearance
+  - toolbar search input field
+  - search text input
+  - form field for text entry
+  - toolbar text search control
+  resolution: compose-components
+  decision: Reuse MatFormField with appearance=outline and MatInput, compose a leading MatIcon in color.primary,
+    use color.surface-container background and shape.corner-extra-small radius. Match the documented icon-button/button-toggle
+    height; remove the resting border while preserving a visible focus treatment.
+  components:
+  - MatFormField
+  - MatInput
+  - MatIcon
+  constraints:
+    tokens:
+    - color.surface-container
+    - color.primary
+    - color.on-surface
+    - typography.body-medium
+    - shape.corner-extra-small
+    states:
+    - default
+    - hover
+    - focus
+    - disabled
+    - loading
+    - error
+    responsive: keep centered in wide toolbar and full-width below toolbar controls on narrow viewports
+    accessibility:
+    - semantic search input
+    - keyboard operable
+    - visible focus
+    - accessible name
+    interaction: search icon precedes input and field remains visually prominent
+  design_system: angular-material-m3
+  design_system_version: 22.2.5
+  decided_in: 001-gerenciar-notas
+  id: dd-008
+  status: active
+  decided_on: '2026-10-29'

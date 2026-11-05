@@ -69,6 +69,7 @@ interface CreateDraft {
       </div>
       <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
         <mat-label>Buscar por título ou conteúdo</mat-label>
+        <mat-icon matPrefix svgIcon="search" aria-hidden="true" />
         <input matInput type="search" [value]="app.query()" (input)="search($event)" />
       </mat-form-field>
       <span class="toolbar-balance" aria-hidden="true"></span>
@@ -246,8 +247,18 @@ interface CreateDraft {
         justify-self: start;
       }
       .search-field {
+        --mat-form-field-container-height: 48px;
+        --mat-form-field-container-vertical-padding: 12px;
+        --mat-form-field-outlined-outline-color: transparent;
+        --mat-form-field-outlined-focus-outline-color: var(--mat-sys-primary);
+        --mat-form-field-outlined-container-shape: var(--mat-sys-corner-extra-small);
+        background-color: var(--mat-sys-surface-container);
+        border-radius: var(--mat-sys-corner-extra-small);
         justify-self: center;
         width: min(100%, 34rem);
+      }
+      .search-field mat-icon[matPrefix] {
+        color: var(--mat-sys-primary);
       }
       .toolbar-balance {
         justify-self: end;

@@ -37,6 +37,16 @@
 
 **Alternativas consideradas**: Construir os controles manualmente com HTML e CSS reutilizaria apenas CDK e reduziria dependências, mas contrariaria a escolha explícita do sistema Material. `MatCard` e `MatDialog` foram preferidos a implementações locais; estilos específicos limitam-se às necessidades de cor, hover e arraste descritas na especificação.
 
+## Apresentação visual do campo de busca
+
+**Decisão**: Manter a composição existente `MatFormField` + `MatInput` com `appearance="outline"` e adicionar `MatIcon` como prefixo de pesquisa. O fundo usa `color.surface-container`, o ícone `color.primary` e a forma `shape.corner-extra-small`; a dimensão alinha-se aos controles da toolbar. O contorno fica oculto em repouso, mas deve continuar visível como indicador de foco.
+
+**Justificativa**: O sistema fornece os componentes e tokens necessários para atualizar a aparência sem criar um primitivo local nem alterar a lógica de busca. O inventário não oferece token equivalente para o arredondamento pedido nem token de altura para o campo; por isso, usa-se o menor token de forma disponível e a dimensão registrada para os controles da toolbar. Acessibilidade de foco tem precedência sobre a remoção de borda em todos os estados.
+
+**Alternativas consideradas**: Um campo HTML/CSS próprio ou novo pacote de busca duplicaria componentes já disponíveis; manter a borda invisível também em foco removeria o único indicador visual de teclado; criar token ou breakpoint não existente contradiz a fidelidade ao inventário.
+
+**Fontes**: inventário `.design-system/inventory.json` (tokens `color.surface-container`, `color.primary`, `shape.corner-extra-small` e dimensões dos controles `icon-button`/`button-toggle`); decisão existente `dd-001` para a composição da toolbar e decisão complementar `dd-008` para a aparência do campo; documentação Angular Material para Form field, Input e Icon, já referenciada em [design-system.md](./design-system.md).
+
 ## NgRx Signals
 
 **Decisão**: Usar SignalStore de `@ngrx/signals` como estado de interface em memória. Os componentes lerão estado reativo e dispararão ações por uma fachada tipada; operações de persistência continuam nos serviços.

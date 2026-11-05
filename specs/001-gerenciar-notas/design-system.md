@@ -17,6 +17,8 @@ O inventário não fornece tokens de espaçamento, elevação ou movimento, nem 
 
 Ícones serão apresentados por `MatIcon` com SVGs locais registrados; não será carregada uma fonte de ícones remota. A documentação de `MatDialog` descreve contenção de foco enquanto o diálogo está aberto e restauração ao fechar. A modal terá fechamento por Escape e controle visível, para que essa contenção não se torne uma armadilha de teclado.
 
+As decisões `dd-001` a `dd-005`, tomadas em `001-gerenciar-notas`, foram conferidas no ledger com a versão instalada `22.2.5`; todas retornaram `stale: false`.
+
 ## Superfícies
 
 ### Barra superior e pesquisa
@@ -29,15 +31,34 @@ O inventário não fornece tokens de espaçamento, elevação ou movimento, nem 
 
 **Restrições**: toolbar não determina sozinha o arranjo interno; a composição especifica a ordem dos controles. Estados, nomes acessíveis e foco devem seguir os princípios citados. O inventário não define breakpoint ou comportamento responsivo específico; o layout deve refluir sem perder controles.
 
+#### Aparência do campo de busca
+
+**Resolução**: Compose (componentes)  
+**Decisão**: preservar a composição `MatFormField` (`appearance="outline"`) + `MatInput` e adicionar `MatIcon` como prefixo de pesquisa. O campo usa `color.surface-container`, o ícone usa `color.primary`, e o contorno usa `shape.corner-extra-small`; a borda fica ausente em repouso, mas o estado de foco conserva um indicador visível. A altura corresponde à dimensão documentada para `icon-button` e `button-toggle`; o campo permanece centralizado em telas largas e ocupa a linha abaixo dos controles em telas estreitas.
+**Fonte**: decisão registrada `dd-008`, complementar à composição de toolbar `dd-001`. As buscas por “search field” e “form field for text entry” não retornaram componentes nomeados no índice; o inventário documenta `form-field` e sua borda de outline. As buscas por padrão “toolbar search input field” e “toolbar text search control” não retornaram padrões.
+**Candidatos considerados**:
+
+| Candidato | Fonte | Veredito |
+|---|---|---|
+| `MatFormField` com `MatInput` | Inventário local e documentação Angular Material | Atende à entrada de texto e à aparência `outline`; recebe configuração visual específica sem substituir o componente. |
+| `MatIcon` como prefixo | Documentação Angular Material e ícones SVG registrados localmente | Compõe o ícone de pesquisa à esquerda sem introduzir uma fonte ou primitivo próprio. |
+| Padrão de pesquisa da toolbar | Busca no inventário | Nenhum padrão registrado nas duas buscas realizadas. |
+
+**Princípios que se aplicam**: PRIN-SEMANTIC-HTML, PRIN-KEYBOARD, PRIN-FOCUS-VISIBLE, PRIN-ACCESSIBLE-NAME, PRIN-CONTRAST, PRIN-TARGET-SIZE, PRIN-RESPONSIVE, PRIN-INPUT-MODALITIES, PRIN-STATE-COVERAGE, PRIN-STATE-FEEDBACK, PRIN-TOKENS, PRIN-NO-BESPOKE-PRIMITIVES.
+
+**Restrições**: o token `shape.corner-extra-small` corresponde à menor forma disponível e aproxima o arredondamento descrito no pedido, pois o inventário não oferece um token equivalente. A dimensão de altura reutiliza a dimensão publicada dos controles da toolbar porque não há token semântico de altura para o campo. A cor de fundo e a cor do ícone usam tokens existentes. O estado sem borda aplica-se ao repouso, não pode remover foco visível. A busca continua com rótulo acessível e disponível por teclado; erros de consulta continuam apresentados no estado de erro da página. Nas larguras estreitas, a pesquisa reflui para uma linha própria e deve permanecer utilizável.
+
+**Sucesso visual verificável**: o campo conserva `appearance="outline"`, mas não apresenta contorno em repouso; fundo, forma e ícone usam os tokens indicados; em foco o indicador continua perceptível; a altura se alinha aos controles da barra; a busca continua identificada no accessibility tree. O layout largo mantém a centralização e o estreito empilha o campo sem recorte.
+
 ### Formulário de criação
 
 **Resolução**: Compose (componentes)  
 **Decisão**: `MatFormField` com `MatInput` para entradas e `matIconButton` para ações iconográficas. O formulário fica imediatamente abaixo da barra superior.  
 **Fonte**: decisão registrada `dd-002`; documentação oficial de [Form field](https://material.angular.dev/components/form-field/overview) e [Input](https://material.angular.dev/components/input/overview), além dos componentes listados no inventário.  
 **Tokens**: `color.outline`, `color.on-surface`, `typography.body-medium` e `shape.corner-small`, quando aplicáveis.  
-**Princípios**: PRIN-SEMANTIC-HTML, PRIN-KEYBOARD, PRIN-FOCUS-VISIBLE, PRIN-ACCESSIBLE-NAME, PRIN-CONTRAST, PRIN-TARGET-SIZE, PRIN-RESPONSIVE, PRIN-STATE-COVERAGE, PRIN-STATE-FEEDBACK, PRIN-TOKENS.
+**Princípios**: PRIN-SEMANTIC-HTML, PRIN-KEYBOARD, PRIN-FOCUS-VISIBLE, PRIN-ACCESSIBLE-NAME, PRIN-CONTRAST, PRIN-TARGET-SIZE, PRIN-RESPONSIVE, PRIN-INPUT-MODALITIES, PRIN-STATE-COVERAGE, PRIN-STATE-FEEDBACK, PRIN-TOKENS.
 
-**Restrições**: validação, foco, estado desabilitado, carregamento e falha devem ser explícitos; mensagens não podem depender somente de cor. O inventário não documenta espaçamento ou breakpoints.
+**Restrições**: validação, foco, estado desabilitado, carregamento e falha devem ser explícitos; mensagens não podem depender somente de cor. Os campos textuais usam `MatFormField`/`MatInput`; seleção de cor e anexação de arquivo usam os controles nativos `input type="color"` e `input type="file"`, com rótulos acessíveis. A remoção de imagem usa ação iconográfica nomeada. O inventário não documenta espaçamento ou breakpoints nem mapeia esses dois tipos de entrada.
 
 ### Coleção, cards e reordenação
 
@@ -61,7 +82,7 @@ O `MatCard` não aplica padding no elemento do card; seções internas documenta
 **Tokens**: `color.surface`, `color.surface-container`, `color.on-surface`, `typography.title-medium`, `typography.body-medium` e `shape.corner-medium`, quando aplicáveis. A cor escolhida pelo usuário pertence aos dados da nota; sem cor escolhida, o fundo permanece transparente.  
 **Princípios**: PRIN-SEMANTIC-HTML, PRIN-KEYBOARD, PRIN-FOCUS-VISIBLE, PRIN-ACCESSIBLE-NAME, PRIN-NOT-COLOR-ALONE, PRIN-CONTRAST, PRIN-TARGET-SIZE, PRIN-RESPONSIVE, PRIN-INPUT-MODALITIES, PRIN-REDUCED-MOTION, PRIN-STATE-COVERAGE, PRIN-STATE-FEEDBACK, PRIN-TOKENS, PRIN-NO-BESPOKE-PRIMITIVES.
 
-**Restrições**: hover destaca levemente o card e apresenta ações iconográficas, que também ficam visíveis por foco e disponíveis por toque; o arraste inicia em qualquer área. O inventário não oferece token de elevação nem define estados de card; não serão criados nomes de token para esses estilos.
+**Restrições**: hover destaca levemente o card e apresenta ações iconográficas, que também ficam visíveis por foco e disponíveis por toque; o arraste inicia em qualquer área. A confirmação de remoção usa a confirmação nativa do navegador, sem componente de diálogo local. O inventário não oferece token de elevação nem define estados de card; não serão criados nomes de token para esses estilos.
 
 ### Detalhe da nota
 
@@ -71,6 +92,33 @@ O `MatCard` não aplica padding no elemento do card; seções internas documenta
 **Princípios**: PRIN-SEMANTIC-HTML, PRIN-KEYBOARD, PRIN-FOCUS-VISIBLE, PRIN-ACCESSIBLE-NAME, PRIN-CONTRAST, PRIN-RESPONSIVE, PRIN-INPUT-MODALITIES, PRIN-STATE-COVERAGE, PRIN-STATE-FEEDBACK, PRIN-TOKENS.
 
 **Restrições**: conteúdo reflowa nas larguras suportadas; erros de carregamento/remover são apresentados sem indicar sucesso. O inventário local não documenta o componente nem o comportamento de foco, mas a documentação oficial do sistema cobre essas capacidades.
+
+### Seleção de cor e anexos de imagem
+
+**Resolução**: Compose (controles nativos)  
+**Decisão**: `input type="color"` e `input type="file"` nativos capturam dados da nota; ações de remoção usam `matIconButton`. Não será criada uma abstração local para controles que o inventário não fornece.  
+**Fonte**: decisão registrada `dd-006`, criada após busca no ledger sem correspondência específica; buscas no inventário por “select color for note background”, “color picker”, “file selection upload images” e “image attachment file picker” não retornaram componentes. Buscas de padrão por “note color selection control”, “color input control pattern”, “image attachment upload flow” e “image upload with file validation” também não retornaram resultados.
+**Candidatos considerados**:
+
+| Candidato | Fonte | Veredito |
+|---|---|---|
+| `MatFormField`/`MatInput` | Inventário e documentação oficial | Adequados aos campos textuais do formulário, mas não fornecem seleção nativa de cor ou arquivo. |
+| `matIconButton` | Inventário | Fornece a ação iconográfica de remover, mas não a seleção de cor ou arquivo. |
+| Controles nativos do navegador | Plataforma | Fornecem seleção de cor e arquivo sem criar um componente local; compõem a superfície junto aos campos e ações Material existentes. |
+| Padrões de seleção de cor/anexo | Inventário | Não há padrão registrado para esses controles. |
+**Tokens**: nenhum token de cor de interface para o valor de cor escolhido pelo usuário; tokens de interface aplicáveis seguem a composição do formulário.
+**Princípios**: PRIN-SEMANTIC-HTML, PRIN-KEYBOARD, PRIN-FOCUS-VISIBLE, PRIN-ACCESSIBLE-NAME, PRIN-NOT-COLOR-ALONE, PRIN-CONTRAST, PRIN-TARGET-SIZE, PRIN-RESPONSIVE, PRIN-INPUT-MODALITIES, PRIN-STATE-COVERAGE, PRIN-STATE-FEEDBACK, PRIN-TOKENS, PRIN-NO-BESPOKE-PRIMITIVES.
+
+**Restrições**: controles devem ter rótulos acessíveis e estados de validação/erro devem ser comunicados em texto; formatos e limites de imagem seguem RF-005. A cor selecionada é dado da nota, não token de interface. O inventário não mapeia controles nativos de cor ou arquivo.
+
+### Confirmação de remoção
+
+**Resolução**: Reuse (plataforma)  
+**Decisão**: usar a confirmação nativa do navegador antes de remover a nota, sem criar um diálogo local.
+**Fonte**: decisão registrada `dd-007`; o fluxo de remoção existente usa a confirmação do navegador. As buscas iniciais no ledger e no inventário por “confirmation dialog”, “confirm deletion dialog” e “native confirmation dialog” não encontraram uma decisão ou padrão do sistema.
+**Princípios**: PRIN-SEMANTIC-HTML, PRIN-KEYBOARD, PRIN-FOCUS-VISIBLE, PRIN-ACCESSIBLE-NAME, PRIN-RESPONSIVE, PRIN-INPUT-MODALITIES, PRIN-STATE-COVERAGE, PRIN-STATE-FEEDBACK, PRIN-TOKENS.
+
+**Restrições**: a confirmação e o gerenciamento de foco ficam a cargo do navegador; cancelar não altera a nota. Não há tokens de interface aplicáveis à superfície nativa do navegador.
 
 ### Estados e mensagens da coleção
 
@@ -82,7 +130,7 @@ O `MatCard` não aplica padding no elemento do card; seções internas documenta
 
 ## Impacto no sistema de design
 
-O inventário local está incompleto em relação à documentação oficial atual: ele não lista `MatCard`, `MatDialog`, `MatIcon` ou `MatInput`. A pessoa responsável pelo inventário deve sincronizar esses componentes e documentar os breakpoints e tokens de espaçamento/elevação se fizerem parte da base oficial. O plano usa documentação oficial para não tratar componentes disponíveis como lacunas nem criar substitutos locais.
+O inventário local está incompleto em relação à documentação oficial atual: ele não lista `MatCard`, `MatDialog`, `MatIcon` ou `MatInput`, nem mapeia os controles nativos de cor e arquivo. A pessoa responsável pelo inventário deve sincronizar esses componentes e documentar os breakpoints e tokens de espaçamento/elevação se fizerem parte da base oficial. O plano usa documentação oficial para não tratar componentes disponíveis como lacunas nem criar substitutos locais. A confirmação nativa do navegador permanece fora da tematização Angular Material.
 
 ## Validation round 1 — 2026-10-29
 
@@ -111,3 +159,7 @@ Responsive behavior: no named breakpoints are supplied by the inventory; reflow 
 Tests: 18 unit tests and 11 Chromium browser tests passed. Production build passed with a bundle-budget warning below the configured error limit.
 
 Verdict: the implementation meets its design requirements.
+
+## Verificação do planejamento — 2026-10-29
+
+Gate do sistema de design: aprovado. As sete superfícies têm resolução registrada; as decisões `dd-001` a `dd-005` foram verificadas contra a versão instalada `22.2.5`, e `dd-006`/`dd-007` registram os controles nativos de cor/arquivo e a confirmação de remoção. Os princípios vêm do conjunto padrão do projeto; nenhum está desabilitado ou sem verificação. O inventário não fornece breakpoints nem tokens de espaçamento, elevação ou movimento, e nenhum nome foi inventado. As novas exigências DS-006 e DS-007 correspondem aos controles já presentes; não houve alteração de código nem reexecução de testes nesta etapa de planejamento.

@@ -25,6 +25,7 @@ export const appConfig: ApplicationConfig = {
         'grid_view',
         'view_list',
         'sort',
+        'search',
         'push_pin',
         'edit',
         'delete',

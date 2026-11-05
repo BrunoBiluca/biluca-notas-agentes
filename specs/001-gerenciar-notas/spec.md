@@ -108,6 +108,16 @@ Como usuário, quero buscar por palavras do título ou conteúdo, fixar notas no
 - Os comandos da interface devem usar ícones que expressem sua intenção, como um lápis para editar.
 - O detalhe da nota deve ser aberto em uma modal.
 
+### Search Box (mat-form-field)
+
+- Appearance: outline (não o fill padrão)
+- Background: cinza claro usando `color.surface-container`
+- Border radius: `shape.corner-extra-small`, o token de forma disponível mais próximo do arredondamento solicitado
+- Border color: sem borda no estado padrão; manter indicador de foco visível
+- Icon: Ícone de pesquisa ao lado esquerdo com a cor primária
+- Height: igual à altura documentada para `icon-button` e `button-toggle`
+- Must stand out visually as the primary interactive element in the toolbar
+
 ## Requisitos
 
 ### Requisitos funcionais
@@ -146,6 +156,8 @@ Como usuário, quero buscar por palavras do título ou conteúdo, fixar notas no
 - **CS-005**: Em testes de uso, pelo menos 90% dos participantes conseguem alternar formatos, fixar uma nota e reordenar manualmente uma nota sem ajuda.
 - **CS-006**: Em testes de interface nas larguras suportadas, todos os controles e conteúdos permanecem visíveis e operáveis sem recorte ou rolagem horizontal.
 - **CS-007**: Todas as ações da interface podem ser identificadas e acionadas por ponteiro, toque e teclado; ações de cards não dependem exclusivamente de hover.
+- **CS-008**: Todas as superfícies da interface correspondem às decisões e aos componentes documentados em [design-system.md](./design-system.md); nenhum nome de token ou breakpoint ausente do inventário é introduzido.
+- **CS-009**: O campo de busca mantém a aparência e os estados definidos em DS-008, alinhando sua altura aos controles da barra, sem borda em repouso e com foco visível, inclusive no reflow em viewport estreita.
 
 ## Pressupostos
 
@@ -165,6 +177,9 @@ Como usuário, quero buscar por palavras do título ou conteúdo, fixar notas no
 - **DS-003**: Os cards DEVEM compor `MatCard` com os controles iconográficos do Material e a interação de arraste do CDK, conforme [design-system.md](./design-system.md): fundo selecionado ou transparente quando ausente, imagens acima do título sem espaçamento interno ao redor, destaque leve no hover e ações também acessíveis por foco e toque; o arraste DEVE poder iniciar em qualquer área do card.
 - **DS-004**: O detalhe da nota DEVE ser apresentado por `MatDialog`, com imagens acima do título e sem espaçamento interno ao redor delas, nome acessível, fechamento por teclado e controle visível, e retorno do foco ao acionador ao fechar.
 - **DS-005**: A apresentação DEVE usar os tokens disponíveis no inventário quando aplicáveis e os componentes Material documentados em [design-system.md](./design-system.md). Cores selecionadas pelo usuário para uma nota são conteúdo da nota, não tokens de interface; a ausência dessa cor mantém o fundo transparente. Não DEVEM ser inventados nomes de tokens ou breakpoints inexistentes no inventário.
+- **DS-006**: A seleção da cor da nota e dos arquivos de imagem DEVE reutilizar os controles nativos `input type="color"` e `input type="file"`, com rótulos acessíveis; a remoção de imagem DEVE usar uma ação iconográfica Material nomeada, conforme [design-system.md](./design-system.md).
+- **DS-007**: A confirmação de remoção DEVE reutilizar a confirmação nativa do navegador, sem criar um diálogo local; cancelar DEVE manter a nota inalterada, conforme [design-system.md](./design-system.md).
+- **DS-008**: O campo de busca DEVE usar `MatFormField` com aparência `outline` e `MatInput`, incluir ícone de pesquisa à esquerda em `color.primary`, usar fundo `color.surface-container` e forma `shape.corner-extra-small`, sem borda no estado padrão e com foco visível; sua altura DEVE corresponder à altura documentada para `icon-button` e `button-toggle`, destacando-o como o principal controle interativo da barra, conforme [design-system.md](./design-system.md).
 
 ### Princípios em vigor
 

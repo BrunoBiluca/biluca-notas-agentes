@@ -73,6 +73,8 @@ description: 'Tarefas para implementar o gerenciamento de notas pessoais'
 - [x] T026 [US2] Reorganizar a página principal com `MatToolbar`, alternador `MatButtonToggleGroup`, botão iconográfico de ordenação e busca centralizada em `MatFormField`/`MatInput`; manter seções “Notas fixadas” e “Notas livres” e reflow sem recorte em `src/app/features/notes/pages/notes-page.component.ts`
 - [x] T027 [US2] Reestruturar cada resumo como `MatCard`, renderizando imagens antes do título e sem espaçamento interno ao redor, fundo selecionado ou transparente, hover leve e ações iconográficas acessíveis por foco/toque em `src/app/features/notes/ui/note-card.component.ts` e `src/app/features/notes/ui/note-images.component.ts`
 - [x] T028 [US2] Remover o botão exclusivo de arraste e aplicar CDK Drag ao card inteiro, mantendo as ações operáveis e a alternativa de reordenação por teclado em `src/app/features/notes/pages/notes-page.component.ts` e `src/app/features/notes/ui/note-card.component.ts`
+- [x] T046 [P] [US2] Estender asserções Playwright para verificar ícone prefixado, fundo, forma, borda ausente em repouso, foco visível, altura alinhada à toolbar e reflow sem recorte no Search Box em `tests/browser/notes-collection.spec.ts`
+- [x] T047 [P] [US2] Ajustar o template e os estilos locais do Search Box para usar o SVG local `search` registrado em `src/app/app.config.ts` e `public/icons/search.svg`, aplicar os tokens `color.surface-container`, `color.primary` e `shape.corner-extra-small`, ocultar a borda apenas em repouso e preservar foco, rótulo, busca e reflow em `src/app/features/notes/pages/notes-page.component.ts`
 
 ## Fase 5: História 3 — Adicionar imagens às notas (Prioridade: P2)
 
@@ -119,6 +121,8 @@ description: 'Tarefas para implementar o gerenciamento de notas pessoais'
 
 - [x] T044 Atualizar os cenários de Material 3, modal, foco, imagens, hover/toque/teclado e reflow em `specs/001-gerenciar-notas/quickstart.md`
 - [x] T045 Executar testes Vitest, build Angular e cenários Playwright de UI; corrigir falhas e registrar os comandos/resultados em `specs/001-gerenciar-notas/quickstart.md`
+- [x] T048 [P] Atualizar o cenário manual do Search Box com os estados visuais e critérios de aceitação de DS-008 em `specs/001-gerenciar-notas/quickstart.md`
+- [x] T049 Executar `npm run test:browser -- tests/browser/notes-collection.spec.ts`, `npm test -- --watch=false` e `npm run build`; corrigir falhas e registrar os resultados em `specs/001-gerenciar-notas/quickstart.md`
 
 ## Dependências e ordem de execução
 
@@ -127,10 +131,10 @@ description: 'Tarefas para implementar o gerenciamento de notas pessoais'
 - **Setup (Fase 1)**: T003 e T004 devem concluir antes da integração Material; T001 e T002 já estão concluídas.
 - **Fundacional (Fase 2)**: T005–T009 estão concluídas e precedem todas as histórias.
 - **US1 (Fase 3)**: T019 e T020 dependem do provider Material de T003–T004 e da fachada já existente.
-- **US2 (Fase 4)**: T026–T028 dependem do Material de T003–T004; T028 depende da estrutura de card de T027.
+- **US2 (Fase 4)**: T026–T028 dependem do Material de T003–T004; T028 depende da estrutura de card de T027. T046 e T047 podem avançar em paralelo após as tarefas atuais de US2; T049 depende de T046–T048.
 - **US3 (Fase 5)**: T036 depende da composição de card/modal de T019 e T027; a persistência de imagens já está implementada.
 - **US4 (Fase 6)**: T042 depende dos controles da toolbar em T026 e da composição do card em T027; T043 depende do CDK em T028.
-- **Polimento (Fase 7)**: T044–T045 dependem das mudanças de UI em todas as histórias.
+- **Polimento (Fase 7)**: T044–T045 dependem das mudanças de UI em todas as histórias; T048 complementa o guia para o Search Box e T049 valida as tarefas T046–T048.
 
 ### Dependências entre histórias
 
@@ -143,10 +147,11 @@ description: 'Tarefas para implementar o gerenciamento de notas pessoais'
 
 - T003 e T004 são sequenciais porque T004 usa o registro de ícones habilitado pela dependência.
 - Em US1, T013 pode ser implementada/testada independentemente de T019–T020; T019 e T020 podem avançar em paralelo após T003–T004, desde que os arquivos compartilhados sejam coordenados.
-- Em US2, T023 pode ser escrito em paralelo com T026; T027 pode ser feito em paralelo com T026 após setup Material; T028 depende de T027.
+- Em US2, T023 pode ser escrito em paralelo com T026; T027 pode ser feito em paralelo com T026 após setup Material; T028 depende de T027. T046 (teste Playwright) e T047 (implementação visual) podem avançar em paralelo por alterarem arquivos distintos.
 - Em US3, T031 pode ser escrito em paralelo com T036; persistência/validação existente não bloqueia a tarefa visual.
 - Em US4, T039 pode ser escrito em paralelo com T042–T043; T043 depende da ativação de arraste em T028.
 - As histórias US1 e US2 envolvem a página principal e devem ser integradas em sequência para evitar conflitos em `notes-page.component.ts`.
+- Em polimento, T048 pode ser escrita em paralelo com T046–T047; T049 deve aguardar a implementação, as asserções e o guia.
 
 ## Estratégia de implementação
 
@@ -158,7 +163,7 @@ Entregar **US1 + US2**, ambas P1, incluindo criação na página principal, deta
 
 1. Adicionar Material 3 e registrar ícones SVG locais.
 2. Concluir US1: formulário de criação principal, modal de detalhe e foco acessível.
-3. Concluir US2: toolbar, seções, cards com imagens e arraste em qualquer área.
+3. Concluir US2: toolbar, seções, Search Box conforme DS-008, cards com imagens e arraste em qualquer área.
 4. Concluir US3: imagens no card/detalhe, sem espaçamento interno ao redor.
 5. Concluir US4: ícones de organização, busca e alternativas por teclado.
 6. Executar cenários do quickstart, Vitest, build e Playwright.
@@ -166,17 +171,18 @@ Entregar **US1 + US2**, ambas P1, incluindo criação na página principal, deta
 ## Critérios independentes de teste por história
 
 - **US1**: criar pelo formulário principal, abrir modal, editar/salvar, cancelar e remover; validar foco restaurado, título obrigatório, isolamento e conflitos entre abas.
-- **US2**: conferir toolbar e busca centralizada, formulário abaixo, seções fixadas/livres, lista/grade, ações disponíveis por hover/foco/toque e carregamento de mais de 100 notas sem recorte responsivo.
+- **US2**: conferir toolbar e busca centralizada; validar no Search Box ícone prefixado, tokens visuais, borda ausente em repouso, foco visível, altura alinhada e reflow sem recorte; conferir formulário abaixo, seções fixadas/livres, lista/grade, ações por hover/foco/toque e carregamento de mais de 100 notas.
 - **US3**: aceitar JPEG/PNG/WebP/GIF de até 10.000.000 bytes, rejeitar arquivo inválido, exibir imagens antes do título sem padding no card e modal, e remover imagem sem alterar outros campos.
 - **US4**: buscar coleção completa de 1.000 notas em até 2 segundos, fixar antes das livres, alternar ordenação, mover por arraste a partir de qualquer área e por teclado, mantendo ordem após recarga.
 
 ## Resumo da geração
 
-- **Total**: 45 tarefas (45 concluídas, 0 pendentes).
+- **Total**: 49 tarefas (49 concluídas, 0 pendentes).
 - **US1**: 11 tarefas; todas concluídas.
-- **US2**: 8 tarefas; todas concluídas.
+- **US2**: 10 tarefas; todas concluídas.
 - **US3**: 8 tarefas; todas concluídas.
 - **US4**: 7 tarefas; todas concluídas.
-- **Oportunidades paralelas**: T013 e tarefas independentes de UI após setup; T023/T026; T027/T026; T031/T036; T039/T042–T043.
-- **MVP entregue**: US1 + US2 (P1), incluindo a nova apresentação Material da página principal; US3 e US4 também foram concluídas.
-- **Formato**: todas as tarefas usam checkbox, ID sequencial, rótulos de paralelismo/história quando aplicáveis e caminhos de arquivos.
+- **Polimento**: 4 tarefas; todas concluídas.
+- **Oportunidades paralelas**: T013 e tarefas independentes de UI após setup; T023/T026; T027/T026; T031/T036; T039/T042–T043; T046/T047; T048 pode avançar enquanto T046/T047 são executadas.
+- **MVP sugerido**: US1 + US2 (P1), incluindo a conclusão da apresentação do Search Box conforme DS-008; US3 e US4 estão concluídas.
+- **Formato**: todas as tarefas usam checkbox, ID sequencial, rótulos de paralelismo/história quando aplicáveis e caminhos de arquivos; as novas tarefas estão no formato exigido.
