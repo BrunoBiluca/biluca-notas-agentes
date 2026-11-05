@@ -146,7 +146,9 @@ export class NoteCardComponent {
   readonly actionError = signal('');
 
   get foregroundColor(): string {
-    return getForegroundColor(this.note.backgroundColor);
+    return this.note.backgroundColor
+      ? getForegroundColor(this.note.backgroundColor)
+      : 'var(--mat-sys-on-surface)';
   }
 
   async togglePin(): Promise<void> {

@@ -95,12 +95,12 @@ interface NoteDetailDialogData {
         white-space: pre-wrap;
       }
       .date {
-        color: var(--mat-sys-on-surface);
+        color: inherit;
         font-size: var(--mat-sys-body-medium-size);
         margin-top: 1.5rem;
       }
       .delete-button {
-        color: var(--mat-sys-error);
+        color: inherit;
       }
       .error {
         color: var(--mat-sys-error);
@@ -131,7 +131,9 @@ export class NoteDetailPage implements OnInit {
   }
 
   foregroundColor(note: Note): string {
-    return getForegroundColor(note.backgroundColor);
+    return note.backgroundColor
+      ? getForegroundColor(note.backgroundColor)
+      : 'var(--mat-sys-on-surface)';
   }
 
   edit(note: Note): void {

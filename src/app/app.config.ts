@@ -8,6 +8,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { provideRouter } from '@angular/router';
 import { CURRENT_USER_PROVIDER, LOCAL_USER_PROVIDER } from './core/identity/current-user.provider';
+import { THEME_PREFERENCE_SERVICE } from './core/theme/theme-preference.contract';
+import { ThemePreferenceServiceImpl } from './core/theme/theme-preference.service';
 import { routes } from './app.routes';
 import { EDITING_SESSION_COORDINATOR_PROVIDER } from './features/notes/data-access/editing-session.coordinator';
 import { NOTE_IMAGE_REPOSITORY_PROVIDER } from './features/notes/data-access/note-image.repository';
@@ -19,6 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideAppInitializer(() => {
+      inject(THEME_PREFERENCE_SERVICE).initialize();
       const icons = inject(MatIconRegistry);
       const sanitizer = inject(DomSanitizer);
       for (const name of [
@@ -38,10 +41,15 @@ export const appConfig: ApplicationConfig = {
         'arrow_back',
         'refresh',
         'save',
+        'contrast',
       ]) {
         icons.addSvgIcon(name, sanitizer.bypassSecurityTrustResourceUrl(`/icons/${name}.svg`));
       }
     }),
+    {
+      provide: THEME_PREFERENCE_SERVICE,
+      useExisting: ThemePreferenceServiceImpl,
+    },
     { provide: CURRENT_USER_PROVIDER, useValue: LOCAL_USER_PROVIDER },
     EDITING_SESSION_COORDINATOR_PROVIDER,
     NOTE_IMAGE_REPOSITORY_PROVIDER,

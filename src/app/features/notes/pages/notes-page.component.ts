@@ -7,11 +7,13 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDialog } from '@angular/material/dialog';
 import { Component, HostListener, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NOTES_APPLICATION } from '../data-access/service-contracts';
+import { THEME_PREFERENCE_SERVICE } from '../../../core/theme/theme-preference.contract';
 import { Note, NoteDraft } from '../domain/note.model';
 import { validateNoteImage } from '../domain/note-image-validation';
 import { NoteCardComponent } from '../ui/note-card.component';
@@ -37,6 +39,7 @@ interface CreateDraft {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatMenuModule,
     MatToolbarModule,
     NoteCardComponent,
   ],
@@ -72,7 +75,36 @@ interface CreateDraft {
         <mat-icon matPrefix svgIcon="search" aria-hidden="true" />
         <input matInput type="search" [value]="app.query()" (input)="search($event)" />
       </mat-form-field>
-      <span class="toolbar-balance" aria-hidden="true"></span>
+      <div class="toolbar-actions">
+        <button
+          matIconButton
+          type="button"
+          aria-label="Selecionar tema da aplicação"
+          [matMenuTriggerFor]="themeMenu"
+        >
+          <mat-icon svgIcon="contrast" aria-hidden="true" />
+        </button>
+        <mat-menu #themeMenu="matMenu" aria-label="Opções de tema">
+          <button mat-menu-item (click)="theme.select('light')">
+            <span>Claro</span>
+            @if (theme.mode() === 'light') {
+              <span class="current-theme"> (atual)</span>
+            }
+          </button>
+          <button mat-menu-item (click)="theme.select('dark')">
+            <span>Escuro</span>
+            @if (theme.mode() === 'dark') {
+              <span class="current-theme"> (atual)</span>
+            }
+          </button>
+          <button mat-menu-item (click)="theme.select('system')">
+            <span>Definido pelo sistema</span>
+            @if (theme.mode() === 'system') {
+              <span class="current-theme"> (atual)</span>
+            }
+          </button>
+        </mat-menu>
+      </div>
     </mat-toolbar>
 
     <form class="create-note" (submit)="createNote(); $event.preventDefault()">
@@ -260,8 +292,14 @@ interface CreateDraft {
       .search-field mat-icon[matPrefix] {
         color: var(--mat-sys-primary);
       }
-      .toolbar-balance {
+      .toolbar-actions {
+        align-items: center;
+        display: flex;
+        gap: 0.25rem;
         justify-self: end;
+      }
+      .current-theme {
+        color: var(--mat-sys-on-surface-variant);
       }
       .create-note {
         background: var(--mat-sys-surface-container);
@@ -385,15 +423,16 @@ interface CreateDraft {
           min-height: auto;
         }
         .toolbar-controls {
-          grid-column: 1 / -1;
+          grid-column: 1;
+        }
+        .toolbar-actions {
+          grid-column: 2;
+          grid-row: 1;
         }
         .search-field {
           grid-column: 1 / -1;
           grid-row: 2;
           width: 100%;
-        }
-        .toolbar-balance {
-          display: none;
         }
         .create-fields {
           grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -422,6 +461,7 @@ interface CreateDraft {
 })
 export class NotesPageComponent {
   readonly app = inject(NOTES_APPLICATION);
+  readonly theme = inject(THEME_PREFERENCE_SERVICE);
   private readonly dialog = inject(MatDialog);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);

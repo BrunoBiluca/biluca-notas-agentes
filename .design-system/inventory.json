@@ -3,12 +3,55 @@
   "source": "angular-material-m3",
   "tokens": {
     "color": {
-      "primary": "#6750A4",
-      "on-primary": "#FFFFFF",
-      "surface": "#FEF7FF",
-      "on-surface": "#1D1B20",
-      "surface-container": "#F3EDF7",
-      "outline": "#79747E"
+      "background": "light-dark(#faf9fd, #121316)",
+      "error": "light-dark(#ba1a1a, #ffb4ab)",
+      "error-container": "light-dark(#ffdad6, #93000a)",
+      "inverse-on-surface": "light-dark(#f2f0f4, #2f3033)",
+      "inverse-primary": "light-dark(#abc7ff, #005cbb)",
+      "inverse-surface": "light-dark(#2f3033, #e3e2e6)",
+      "on-background": "light-dark(#1a1b1f, #e3e2e6)",
+      "on-error": "light-dark(#ffffff, #690005)",
+      "on-error-container": "light-dark(#93000a, #ffdad6)",
+      "on-primary": "light-dark(#ffffff, #002f65)",
+      "on-primary-container": "light-dark(#00458f, #d7e3ff)",
+      "on-primary-fixed": "light-dark(#001b3f, #001b3f)",
+      "on-primary-fixed-variant": "light-dark(#00458f, #00458f)",
+      "on-secondary": "light-dark(#ffffff, #283041)",
+      "on-secondary-container": "light-dark(#3e4759, #dae2f9)",
+      "on-secondary-fixed": "light-dark(#131c2b, #131c2b)",
+      "on-secondary-fixed-variant": "light-dark(#3e4759, #3e4759)",
+      "on-surface": "light-dark(#1a1b1f, #e3e2e6)",
+      "on-surface-variant": "light-dark(#44474e, #e0e2ec)",
+      "on-tertiary": "light-dark(#ffffff, #002f65)",
+      "on-tertiary-container": "light-dark(#00458f, #d7e3ff)",
+      "on-tertiary-fixed": "light-dark(#001b3f, #001b3f)",
+      "on-tertiary-fixed-variant": "light-dark(#00458f, #00458f)",
+      "outline": "light-dark(#74777f, #8e9099)",
+      "outline-variant": "light-dark(#c4c6d0, #44474e)",
+      "primary": "light-dark(#005cbb, #abc7ff)",
+      "primary-container": "light-dark(#d7e3ff, #00458f)",
+      "primary-fixed": "light-dark(#d7e3ff, #d7e3ff)",
+      "primary-fixed-dim": "light-dark(#abc7ff, #abc7ff)",
+      "scrim": "light-dark(#000000, #000000)",
+      "secondary": "light-dark(#565e71, #bec6dc)",
+      "secondary-container": "light-dark(#dae2f9, #3e4759)",
+      "secondary-fixed": "light-dark(#dae2f9, #dae2f9)",
+      "secondary-fixed-dim": "light-dark(#bec6dc, #bec6dc)",
+      "shadow": "light-dark(#000000, #000000)",
+      "surface": "light-dark(#faf9fd, #121316)",
+      "surface-bright": "light-dark(#faf9fd, #38393c)",
+      "surface-container": "light-dark(#efedf0, #1f2022)",
+      "surface-container-high": "light-dark(#e9e7eb, #292a2c)",
+      "surface-container-highest": "light-dark(#e3e2e6, #343537)",
+      "surface-container-low": "light-dark(#f4f3f6, #1a1b1f)",
+      "surface-container-lowest": "light-dark(#ffffff, #0d0e11)",
+      "surface-dim": "light-dark(#dbd9dd, #121316)",
+      "surface-tint": "light-dark(#005cbb, #abc7ff)",
+      "surface-variant": "light-dark(#e0e2ec, #44474e)",
+      "tertiary": "light-dark(#005cbb, #abc7ff)",
+      "tertiary-container": "light-dark(#d7e3ff, #00458f)",
+      "tertiary-fixed": "light-dark(#d7e3ff, #d7e3ff)",
+      "tertiary-fixed-dim": "light-dark(#abc7ff, #abc7ff)"
     },
     "typography": {
       "label-large": "500 0.875rem/1.25rem Roboto, sans-serif",
@@ -27,26 +70,69 @@
       "default": "0"
     }
   },
-  "components": {
-    "toolbar": {
-      "height": "64px",
-      "background": "var(--mat-sys-surface)",
-      "title-font": "var(--mat-sys-title-large)"
+  "components": [
+    {
+      "name": "MatToolbar",
+      "description": "Application toolbar for grouping navigation actions.",
+      "states": ["default", "focus"],
+      "accessibility": "Use a descriptive toolbar label and expose interactive controls within the toolbar.",
+      "usage": "Place the theme selector at the right side of the existing top navigation toolbar."
     },
-    "icon-button": {
-      "size": "48px",
-      "icon-size": "24px",
-      "color": "var(--mat-sys-on-surface-variant)"
+    {
+      "name": "MatIconButton",
+      "description": "Native button styled to contain a single icon and perform an action.",
+      "props": ["matIconButton", "aria-label", "matMenuTriggerFor"],
+      "states": ["default", "hover", "focus", "disabled"],
+      "accessibility": "Icon-only buttons require a meaningful accessible name; the documented touch target is 48 by 48.",
+      "usage": "Use as the menu trigger, aligned to the right of the navigation toolbar."
     },
-    "button-toggle": {
-      "height": "48px",
-      "shape": "var(--mat-sys-corner-full)",
-      "selected-background": "var(--mat-sys-secondary-container)"
+    {
+      "name": "MatIcon",
+      "description": "Renders registered SVG or font icons within Angular Material controls.",
+      "props": ["svgIcon", "aria-hidden"],
+      "states": ["default"],
+      "accessibility": "An icon inside an interactive control is decorative; the parent button must provide an accessible name.",
+      "usage": "Reuse icons registered by the application; add a local SVG only when the existing icon set has no suitable glyph."
     },
-    "form-field": {
-      "outline-color": "var(--mat-sys-outline)",
-      "label-font": "var(--mat-sys-body-small)",
-      "container-height": "56px"
+    {
+      "name": "MatMenu",
+      "description": "Floating panel that presents a list of actions or options.",
+      "props": ["matMenuTriggerFor", "xPosition", "yPosition"],
+      "states": ["closed", "open", "focus"],
+      "accessibility": "Uses the menu role, keyboard navigation, focus management and focus restoration to the trigger; provide an accessible label.",
+      "usage": "Attach the menu to the theme icon button and place menu items below the trigger.",
+      "avoid": "Do not place interactive controls other than menu items inside the menu."
+    },
+    {
+      "name": "MatMenuItem",
+      "description": "Keyboard-operable action or choice inside a Material menu.",
+      "props": ["mat-menu-item"],
+      "states": ["default", "focus", "disabled"],
+      "accessibility": "Use descriptive text; indicate the selected theme with text or an icon, not color alone.",
+      "usage": "Provide one item each for light, dark and system theme choices."
+    },
+    {
+      "name": "MatButtonToggleGroup",
+      "description": "Group of mutually exclusive toggle buttons.",
+      "props": ["selected-background", "shape"],
+      "states": ["default", "selected", "focus"],
+      "usage": "Use only for mutually exclusive view modes; not for the requested dropdown menu."
+    },
+    {
+      "name": "MatFormField",
+      "description": "Container for form controls with labels and outlines.",
+      "props": ["outline-color", "label-font", "container-height"],
+      "states": ["default", "focus", "disabled", "error"],
+      "usage": "Use for form inputs; it is not the theme selection menu."
     }
-  }
+  ],
+  "patterns": [
+    {
+      "name": "Angular Material light and dark color scheme",
+      "description": "Angular Material generates semantic color tokens for light and dark schemes from one palette.",
+      "composes": ["mat.theme", "color-scheme"],
+      "usage": "Use theme-type color-scheme with the existing Azure palette, then set the root color-scheme to light, dark or light dark according to the selected mode.",
+      "source": "https://material.angular.dev/guide/theming"
+    }
+  ]
 }

@@ -23,6 +23,7 @@
 #   example       a template to copy and rename for your own CLI
 #   custom        define everything inline under `capabilities:` below
 adapter: static-json
+design_system_version: "22.2.5"
 
 # Override the binary the adapter invokes. Leave empty to use the adapter's own.
 # Split on whitespace, so wrappers work:

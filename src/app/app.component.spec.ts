@@ -1,12 +1,25 @@
 import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { App } from './app.component';
+import { THEME_PREFERENCE_SERVICE } from './core/theme/theme-preference.contract';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        {
+          provide: THEME_PREFERENCE_SERVICE,
+          useValue: {
+            mode: signal<'system'>('system'),
+            persistenceError: signal<string | null>(null),
+            initialize: () => undefined,
+            select: () => undefined,
+          },
+        },
+      ],
     }).compileComponents();
   });
 

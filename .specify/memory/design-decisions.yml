@@ -310,3 +310,93 @@ decisions:
   id: dd-008
   status: active
   decided_on: '2026-10-29'
+- capability: theme menu in navigation toolbar
+  aliases:
+  - theme selector
+  - menu
+  - dropdown menu theme options
+  resolution: compose-components
+  decision: MatToolbar with a right-aligned MatIconButton opens MatMenu containing three MatMenuItem choices;
+    use the existing MatIcon SVG registry for its glyph and mark the current choice in text.
+  components:
+  - MatToolbar
+  - MatIconButton
+  - MatIcon
+  - MatMenu
+  - MatMenuItem
+  rejected:
+  - candidate: MatButtonToggleGroup
+    reason: Segmented toggle does not match the requested dropdown menu.
+  - candidate: MatFormField
+    reason: A form field is not an action or choice menu.
+  constraints:
+    tokens:
+    - color.surface
+    - color.on-surface
+    - color.primary
+    - color.on-primary
+    - color.outline
+    states:
+    - closed
+    - open
+    - focus
+    - selected
+    - disabled
+    - persistence-error
+    responsive: Keep the toolbar trigger and menu visible without clipping at narrow viewports; no named
+      breakpoints are published.
+    accessibility:
+    - accessible trigger name
+    - keyboard navigation
+    - focus restoration
+    - selected state expressed in text
+    interaction: The icon button opens the menu; choosing one of the three items applies that option. A storage
+      failure leaves the choice active for the session and is announced without claiming it was saved.
+  design_system: angular-material-m3
+  design_system_version: 22.2.5
+  decided_in: 002-temas-visuais
+  id: dd-009
+  status: active
+  decided_on: '2026-11-05'
+- capability: application light and dark color scheme
+  aliases:
+  - appearance preference
+  - color scheme
+  - light and dark color scheme
+  - theme toggle
+  resolution: compose-pattern
+  decision: Use Angular Material's documented light/dark color-scheme pattern with the existing Azure
+    palette; the selected mode sets light, dark, or system-following light dark color-scheme.
+  components:
+  - mat.theme
+  - color-scheme
+  - Azure palette
+  rejected:
+  - candidate: third-party themes
+    reason: Explicitly outside the feature scope.
+  - candidate: note-specific colors as the application theme
+    reason: Note background colors remain per-note data and must not replace the global color scheme.
+  constraints:
+    tokens:
+    - color.surface
+    - color.on-surface
+    - color.surface-container
+    - color.primary
+    - color.on-primary
+    - color.outline
+    - color.error
+    states:
+    - light
+    - dark
+    - system
+    responsive: Inherit current application reflow; no named design-system breakpoints are published.
+    accessibility:
+    - contrast in light and dark schemes
+    - preserve legibility of notes with their own backgrounds
+    interaction: Explicit mode selects one color scheme; system mode follows the device preference.
+  design_system: angular-material-m3
+  design_system_version: 22.2.5
+  decided_in: 002-temas-visuais
+  id: dd-010
+  status: active
+  decided_on: '2026-11-05'
