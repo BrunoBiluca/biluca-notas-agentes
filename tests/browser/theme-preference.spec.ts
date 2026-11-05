@@ -44,6 +44,19 @@ test('follows operating-system color changes while system mode is selected', asy
   await expect(page.locator('html')).toHaveCSS('color-scheme', 'light dark');
 });
 
+test('uses the light appearance when the device has no color-scheme preference', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'no-preference' });
+  await page.goto('/notes');
+  expect(
+    await page.evaluate(() => window.matchMedia('(prefers-color-scheme: dark)').matches),
+  ).toBe(false);
+  await page.getByRole('button', { name: 'Selecionar tema da aplicação' }).click();
+  await page.getByRole('menuitem', { name: /^Definido pelo sistema/ }).click();
+
+  await expect(page.locator('html')).toHaveCSS('color-scheme', 'light dark');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(239, 237, 240)');
+});
+
 test('supports choosing a theme with keyboard navigation', async ({ page }) => {
   await page.goto('/notes');
   const trigger = page.getByRole('button', { name: 'Selecionar tema da aplicação' });

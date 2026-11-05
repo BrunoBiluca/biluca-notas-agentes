@@ -1,6 +1,15 @@
 import { expect, test } from '@playwright/test';
 import { makeNotes, seedNotes } from './helpers';
 
+const pixelImage = {
+  name: 'pixel.png',
+  mimeType: 'image/png',
+  buffer: Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l2cAAAAASUVORK5CYII=',
+    'base64',
+  ),
+};
+
 function luminance(color: string): number {
   const channels = color.match(/[\d.]+/g)?.slice(0, 3).map(Number);
   if (!channels || channels.length !== 3) throw new Error(`Unsupported computed color: ${color}`);
@@ -123,5 +132,122 @@ test('preserves note colors and core collection interactions in every theme', as
     if ((await sortButton.getAttribute('aria-pressed')) === 'true') await sortButton.click();
     await sortButton.click();
     await expect(page.getByRole('button', { name: /ordem manual/i })).toBeVisible();
+  }
+});
+
+test('preserves note and image records across theme changes and reloads', async ({ page }) => {
+  await seedNotes(page, []);
+  await page.getByRole('textbox', { name: 'Título' }).fill('Imagem preservada');
+  await page.getByRole('textbox', { name: 'Conteúdo' }).fill('Conteúdo intacto');
+  await page.locator('input[type=file]').setInputFiles(pixelImage);
+  await page.getByRole('button', { name: 'Criar nota' }).click();
+
+  const card = page.getByTestId('note-card').filter({ hasText: 'Imagem preservada' });
+  await expect(card.locator('app-note-images img')).toHaveCount(1);
+
+  const snapshot = () =>
+    page.evaluate(async () => {
+      const request = indexedDB.open('biluca-notes', 1);
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      const tx = db.transaction(['notes', 'note-images'], 'readonly');
+      const notes = await new Promise<Record<string, unknown>[]>((resolve, reject) => {
+        const getAll = tx.objectStore('notes').getAll();
+        getAll.onsuccess = () => resolve(getAll.result);
+        getAll.onerror = () => reject(getAll.error);
+      });
+      const images = await new Promise<
+        Array<{ id: string; noteId: string; ownerId: string; mimeType: string; sizeBytes: number; blob: Blob }>
+      >((resolve, reject) => {
+        const getAll = tx.objectStore('note-images').getAll();
+        getAll.onsuccess = () => resolve(getAll.result);
+        getAll.onerror = () => reject(getAll.error);
+      });
+      const imageData = await Promise.all(
+        images.map(async ({ blob, ...image }) => ({
+          ...image,
+          blobType: blob.type,
+          bytes: Array.from(new Uint8Array(await blob.arrayBuffer())),
+        })),
+      );
+      db.close();
+      return { notes, images: imageData };
+    });
+
+  const original = await snapshot();
+  const trigger = page.getByRole('button', { name: 'Selecionar tema da aplicação' });
+  for (const [label, mode] of [
+    ['Claro', 'light'],
+    ['Escuro', 'dark'],
+    ['Definido pelo sistema', 'system'],
+  ]) {
+    await trigger.click();
+    await page.getByRole('menuitem', { name: label, exact: true }).click();
+    await expect(page.locator('html')).toHaveCSS(
+      'color-scheme',
+      mode === 'system' ? 'light dark' : mode,
+    );
+    await page.reload();
+
+    const restoredCard = page.getByTestId('note-card').filter({ hasText: 'Imagem preservada' });
+    await expect(restoredCard.locator('app-note-images img')).toHaveCount(1);
+    await expect(restoredCard.getByRole('button', { name: 'Imagem preservada' })).toBeVisible();
+    await restoredCard.getByRole('button', { name: 'Imagem preservada' }).click();
+    await expect(
+      page.getByRole('dialog').locator('app-note-images img'),
+    ).toHaveCount(1);
+    await page.getByRole('dialog').getByRole('button', { name: 'Fechar detalhe da nota' }).click();
+    expect(await snapshot()).toEqual(original);
+  }
+});
+
+test('creates, edits, and removes notes in every theme', async ({ page }) => {
+  await seedNotes(page, []);
+  const trigger = page.getByRole('button', { name: 'Selecionar tema da aplicação' });
+
+  for (const [label, mode] of [
+    ['Claro', 'light'],
+    ['Escuro', 'dark'],
+    ['Definido pelo sistema', 'system'],
+  ]) {
+    await trigger.click();
+    await page.getByRole('menuitem', { name: label, exact: true }).click();
+    await expect(page.locator('html')).toHaveCSS(
+      'color-scheme',
+      mode === 'system' ? 'light dark' : mode,
+    );
+
+    const originalTitle = `Nota ${label}`;
+    const editedTitle = `Nota editada ${label}`;
+    await page.getByRole('textbox', { name: 'Título' }).fill(originalTitle);
+    await page.getByRole('textbox', { name: 'Conteúdo' }).fill(`Conteúdo ${label}`);
+    await page.getByRole('button', { name: 'Criar nota' }).click();
+    await expect(page.getByRole('status')).toContainText('Nota criada com sucesso.');
+
+    const noteButton = page.getByRole('button', { name: originalTitle, exact: true });
+    await expect(noteButton).toBeVisible();
+    await noteButton.click();
+    const detail = page.getByRole('dialog', { name: originalTitle });
+    await expect(detail.getByText(`Conteúdo ${label}`)).toBeVisible();
+    await detail.getByRole('button', { name: 'Editar nota' }).click();
+
+    const titleField = page.getByRole('textbox', { name: 'Título' });
+    await expect(titleField).toHaveValue(originalTitle);
+    await titleField.fill(editedTitle);
+    await page.getByRole('button', { name: 'Salvar nota' }).click();
+
+    const editedDetail = page.getByRole('dialog', { name: editedTitle });
+    await expect(editedDetail).toBeVisible();
+    await expect(editedDetail.getByText(`Conteúdo ${label}`)).toBeVisible();
+    await editedDetail.getByRole('button', { name: 'Fechar detalhe da nota' }).click();
+
+    const editedCard = page.getByTestId('note-card').filter({ hasText: editedTitle });
+    await expect(editedCard).toBeVisible();
+    await editedCard.hover();
+    page.once('dialog', (dialog) => dialog.accept());
+    await editedCard.getByRole('button', { name: 'Remover nota' }).click();
+    await expect(page.getByRole('heading', { name: 'Sua coleção está vazia' })).toBeVisible();
   }
 });

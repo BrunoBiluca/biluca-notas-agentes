@@ -137,3 +137,12 @@ T008: gerar os estilos Sass em src/styles.scss (após T001)
 - [P] indica apenas tarefas em arquivos distintos sem dependência pendente.
 - A preferência de tema em `localStorage` é a exceção delimitada e documentada no plano; os dados de notas continuam no IndexedDB.
 - Não adicionar dependências, temas de terceiros ou alterações de esquema das notas.
+
+## Fase 6: Convergência
+
+**Objetivo**: Completar as verificações de aceitação ainda não cobertas e eliminar a fonte de estilos global obsoleta.
+
+- [X] T015 Estender `tests/browser/theme-notes-compatibility.spec.ts` para incluir notas com imagens e verificar que imagens, cores e registros originais no IndexedDB permanecem preservados após alternar e recarregar nos três modos, conforme CS-004, RF-007/RF-008 e US2/AC1/AC4.
+- [X] T016 Estender `tests/browser/theme-notes-compatibility.spec.ts` para validar criação, edição e remoção de notas em cada um dos três modos, conforme CS-005, RF-009 e US2/AC3.
+- [X] T017 Estender `tests/browser/theme-preference.spec.ts` para simular ausência de preferência de aparência do dispositivo e verificar que o modo do sistema apresenta o tema claro, conforme CS-002, RF-004, US1/AC3 e o caso extremo correspondente.
+- [X] T018 Remover a folha não referenciada `src/styles.css`, confirmando que os estilos globais e o esquema claro/escuro permanecem em `src/styles.scss` conforme a migração de estilos do plano e T001.

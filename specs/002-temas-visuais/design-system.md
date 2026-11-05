@@ -67,7 +67,7 @@
 - [Angular Material — Menu](https://material.angular.dev/components/menu/overview)
 - [Angular Material — Button](https://material.angular.dev/components/button/overview)
 - [Angular Material — Icon](https://material.angular.dev/components/icon/overview)
-- Tema Azure atualmente importado: `src/styles.css` e `node_modules/@angular/material/prebuilt-themes/azure-blue.css`.
+- Tema Azure gerado com a paleta M3 em `src/styles.scss`; a folha precompilada anterior não é mais usada.
 
 ## Validation round 1 — 2026-11-05
 

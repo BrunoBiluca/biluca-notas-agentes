@@ -29,10 +29,11 @@ O Playwright inicia a aplicação por meio da configuração existente em `playw
 Validado em 2026-11-05:
 
 - `npm test -- --watch=false`: 28 testes passaram em 7 arquivos.
-- `npm run test:browser -- --workers=4`: 19 testes passaram; inclui persistência, navegação por teclado, acompanhamento do sistema, movimento reduzido, legibilidade, contraste e menu operável por toque em viewport de 320 px.
+- `npm run test:browser -- --workers=4`: 22 testes passaram; inclui persistência, navegação por teclado, acompanhamento do sistema (inclusive ausência de preferência do dispositivo), movimento reduzido, legibilidade, contraste, preservação de imagens e registros no IndexedDB, CRUD nos três temas e menu operável por toque em viewport de 320 px.
 - `npm run build`: compilação concluída. Permanece o aviso de orçamento já configurado para o bundle inicial (805,92 kB frente ao limite de 500 kB).
 - `git diff --check`: passou.
 - A execução Playwright com os 16 workers padrão falhou no teste preexistente `note-edit-conflicts.spec.ts`, que não recebeu o aviso de edição em outra aba dentro do prazo; o teste isolado e a suíte completa com quatro workers passaram. Nenhuma alteração de produção foi feita para mascarar essa falha de concorrência.
+- A folha antiga `src/styles.css` foi removida após confirmar que a aplicação carrega `src/styles.scss`; a compilação confirmou que os estilos globais e os dois esquemas continuam disponíveis.
 
 Os roteiros manuais abaixo não foram executados com leitor de tela ou dispositivo físico; os fluxos correspondentes foram exercitados pelos testes automatizados indicados.
 
